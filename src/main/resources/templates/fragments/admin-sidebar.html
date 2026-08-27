@@ -1,0 +1,67 @@
+<aside class="sd-sidebar" th:fragment="sidebar" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
+    <div class="sd-sidebar-header">
+        <div class="sd-sidebar-logo">
+            <i class="fas fa-shield-halved"></i>
+        </div>
+        <div class="sd-sidebar-brand">
+            <span class="sd-sidebar-brand-name">CNJ70 Admin</span>
+            <span class="sd-sidebar-brand-sub">Management Console</span>
+        </div>
+    </div>
+
+    <nav class="sd-sidebar-nav">
+        <div class="sd-sidebar-nav-section">
+            <span class="sd-sidebar-nav-title">Tổng quan</span>
+            <a th:href="@{/admin/dashboard}" class="sd-nav-item" data-match="/admin/dashboard">
+                <i class="fas fa-house"></i>
+                <span class="sd-nav-label">Dashboard</span>
+            </a>
+        </div>
+
+        <div class="sd-sidebar-nav-section">
+            <span class="sd-sidebar-nav-title">Quản lý</span>
+            <a th:href="@{/admin/users}" class="sd-nav-item" data-match="/admin/users">
+                <i class="fas fa-users"></i>
+                <span class="sd-nav-label">Người dùng</span>
+            </a>
+            <a th:href="@{/admin/categories}" class="sd-nav-item" data-match="/admin/categories">
+                <i class="fas fa-tags"></i>
+                <span class="sd-nav-label">Danh mục</span>
+            </a>
+            <span class="sd-nav-item sd-nav-item-disabled" aria-disabled="true" title="Sẽ có trong Phase 5">
+                <i class="fas fa-store"></i>
+                <span class="sd-nav-label">Cửa hàng</span>
+                <span class="sd-nav-coming-soon">Soon</span>
+            </span>
+            <span class="sd-nav-item sd-nav-item-disabled" aria-disabled="true" title="Sẽ có trong Phase 6">
+                <i class="fas fa-cart-shopping"></i>
+                <span class="sd-nav-label">Đơn hàng</span>
+                <span class="sd-nav-coming-soon">Soon</span>
+            </span>
+        </div>
+
+        <div class="sd-sidebar-nav-section">
+            <span class="sd-sidebar-nav-title">Khác</span>
+            <a th:href="@{/home}" class="sd-nav-item">
+                <i class="fas fa-globe"></i>
+                <span class="sd-nav-label">Xem website</span>
+            </a>
+            <form th:action="@{/auth/logout}" method="post" style="margin:0;">
+                <button type="submit" class="sd-nav-item">
+                    <i class="fas fa-arrow-right-from-bracket"></i>
+                    <span class="sd-nav-label">Đăng xuất</span>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="sd-sidebar-footer">
+        <div class="sd-sidebar-user">
+            <div class="sd-sidebar-avatar" sec:authentication="name">A</div>
+            <div class="sd-sidebar-user-info">
+                <div class="sd-sidebar-user-name" sec:authentication="name">Admin</div>
+                <div class="sd-sidebar-user-role">Administrator</div>
+            </div>
+        </div>
+    </div>
+</aside>

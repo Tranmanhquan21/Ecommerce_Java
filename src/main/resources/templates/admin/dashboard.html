@@ -1,44 +1,197 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6"
+      th:replace="~{layout/admin-layout :: layout(title='Admin Dashboard - CNJ70', content=~{::main-content}, scripts=~{::page-scripts})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - CNJ70</title>
-    <link rel="stylesheet" th:href="@{/css/admin-vendor.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="dashboard-container">
-        <div class="sidebar">
-            <h2>CNJ70 Admin</h2>
-            <nav>
-                <a th:href="@{/admin/dashboard}"><i class="fas fa-chart-line"></i> Dashboard</a>
-                <a th:href="@{/admin/users}"><i class="fas fa-users"></i> Người dùng</a>
-                <a th:href="@{/admin/categories}"><i class="fas fa-tags"></i> Danh mục</a>
-            </nav>
+<main th:fragment="main-content">
+    <div class="sd-page-head">
+        <div class="sd-page-head-title">
+            <h1>Tổng quan hệ thống</h1>
+            <p>Xin chào, quản trị viên. Dưới đây là bức tranh toàn cảnh về hệ thống.</p>
         </div>
-        <div class="main-content">
-            <main class="dashboard-content">
-                <h1>Dashboard</h1>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <i class="fas fa-users"></i>
-                        <h3>Người dùng</h3>
-                        <p class="stat-value">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-store"></i>
-                        <h3>Cửa hàng</h3>
-                        <p class="stat-value">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-box"></i>
-                        <h3>Sản phẩm</h3>
-                        <p class="stat-value">0</p>
-                    </div>
-                </div>
-            </main>
+        <div class="sd-page-head-actions">
+            <a th:href="@{/home}" class="sd-btn sd-btn-secondary sd-btn-sm">
+                <i class="fas fa-globe"></i>
+                <span>Xem website</span>
+            </a>
         </div>
     </div>
+
+    <div class="sd-stats-grid sd-stats-4">
+        <div class="sd-stat">
+            <div class="sd-stat-head">
+                <div class="sd-stat-icon sd-indigo"><i class="fas fa-users"></i></div>
+            </div>
+            <div class="sd-stat-label">Người dùng</div>
+            <div class="sd-stat-value" th:text="${stats.totalUsers}">0</div>
+            <div class="sd-stat-foot">Tổng số tài khoản</div>
+        </div>
+        <div class="sd-stat">
+            <div class="sd-stat-head">
+                <div class="sd-stat-icon sd-red"><i class="fas fa-store"></i></div>
+            </div>
+            <div class="sd-stat-label">Cửa hàng</div>
+            <div class="sd-stat-value" th:text="${stats.totalShops}">0</div>
+            <div class="sd-stat-foot">Đang hoạt động: <strong th:text="${stats.activeVendors}">0</strong></div>
+        </div>
+        <div class="sd-stat">
+            <div class="sd-stat-head">
+                <div class="sd-stat-icon sd-green"><i class="fas fa-box-open"></i></div>
+            </div>
+            <div class="sd-stat-label">Sản phẩm</div>
+            <div class="sd-stat-value" th:text="${stats.totalProducts}">0</div>
+            <div class="sd-stat-foot">Đang bán: <strong th:text="${stats.activeProducts}">0</strong></div>
+        </div>
+        <div class="sd-stat">
+            <div class="sd-stat-head">
+                <div class="sd-stat-icon sd-amber"><i class="fas fa-shopping-bag"></i></div>
+            </div>
+            <div class="sd-stat-label">Đơn hàng</div>
+            <div class="sd-stat-value" th:text="${stats.totalOrders}">0</div>
+            <div class="sd-stat-foot">Tổng đơn hàng</div>
+        </div>
+    </div>
+
+    <div class="sd-grid sd-grid-3-2">
+        <div class="sd-card">
+            <div class="sd-card-head">
+                <div>
+                    <h3><i class="fas fa-chart-line"></i> Doanh thu nền tảng</h3>
+                    <p>Tổng doanh thu từ các đơn đã giao</p>
+                </div>
+                <span class="sd-badge sd-badge-indigo">All-time</span>
+            </div>
+            <div class="sd-card-body">
+                <div style="text-align:center; padding: 16px 0;">
+                    <div style="font-size:32px; font-weight:700; letter-spacing:-0.02em;"
+                         th:text="${@money.format(stats.totalPlatformRevenue)}">0đ</div>
+                    <div class="sd-text-muted" style="margin-top:6px; font-size:12.5px;">Tổng doanh thu đơn đã giao</div>
+                </div>
+                <div id="adminRevenueChart" class="sd-chart-wrap sd-chart-tall"></div>
+            </div>
+        </div>
+
+        <div class="sd-card">
+            <div class="sd-card-head">
+                <div>
+                    <h3><i class="fas fa-clock"></i> Hoạt động gần đây</h3>
+                    <p>5 đơn hàng mới nhất</p>
+                </div>
+            </div>
+            <div class="sd-card-body sd-card-body-flush">
+                <div th:if="${not #lists.isEmpty(stats.recentActivities)}" class="sd-activity-list">
+                    <div class="sd-activity-item" th:each="act : ${stats.recentActivities}">
+                        <div class="sd-activity-icon"
+                             th:classappend="${act.type == 'ORDER' ? 'sd-amber' : 'sd-indigo'}">
+                            <i class="fas"
+                               th:classappend="${act.type == 'ORDER' ? 'fa-receipt' : 'fa-circle-info'}"></i>
+                        </div>
+                        <div class="sd-activity-body">
+                            <div class="sd-activity-text" th:text="${act.description}">Mô tả hoạt động</div>
+                            <div class="sd-activity-time" th:text="${act.time}">Thời gian</div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${#lists.isEmpty(stats.recentActivities)}" class="sd-empty">
+                    <i class="fas fa-inbox"></i>
+                    <h3>Chưa có hoạt động</h3>
+                    <p>Không có hoạt động nào gần đây</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sd-card">
+        <div class="sd-card-head">
+            <div>
+                <h3><i class="fas fa-bolt"></i> Thao tác nhanh</h3>
+                <p>Truy cập nhanh các khu vực quản lý</p>
+            </div>
+        </div>
+        <div class="sd-card-body">
+            <div class="sd-quick-grid">
+                <a th:href="@{/admin/users}" class="sd-quick-card">
+                    <div class="sd-quick-icon"><i class="fas fa-user-cog"></i></div>
+                    <div class="sd-quick-body">
+                        <div class="sd-quick-title">Quản lý người dùng</div>
+                        <div class="sd-quick-sub">Khách hàng đã đăng ký</div>
+                    </div>
+                </a>
+                <a th:href="@{/admin/categories}" class="sd-quick-card">
+                    <div class="sd-quick-icon"><i class="fas fa-tag"></i></div>
+                    <div class="sd-quick-body">
+                        <div class="sd-quick-title">Quản lý danh mục</div>
+                        <div class="sd-quick-sub">Danh mục sản phẩm</div>
+                    </div>
+                </a>
+                <a th:href="@{/home}" class="sd-quick-card">
+                    <div class="sd-quick-icon"><i class="fas fa-globe"></i></div>
+                    <div class="sd-quick-body">
+                        <div class="sd-quick-title">Xem website</div>
+                        <div class="sd-quick-sub">Trang khách hàng</div>
+                    </div>
+                </a>
+                <span class="sd-quick-card sd-quick-card-disabled" aria-disabled="true">
+                    <div class="sd-quick-icon"><i class="fas fa-store"></i></div>
+                    <div class="sd-quick-body">
+                        <div class="sd-quick-title">Cửa hàng</div>
+                        <div class="sd-quick-sub">Sẽ có trong Phase 5</div>
+                    </div>
+                </span>
+            </div>
+        </div>
+    </div>
+
+</main>
+<th:block th:fragment="page-scripts">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script th:inline="javascript">
+        (function() {
+            var trend = /*[[${stats.revenueTrend}]]*/ [];
+            if (!trend || trend.length === 0) return;
+            var labels = trend.map(function(t){ return t.label; });
+            var revenue = trend.map(function(t){ return Number(t.revenue); });
+            var options = {
+                chart: {
+                    type: 'area',
+                    height: 260,
+                    toolbar: { show: false },
+                    fontFamily: 'Work Sans, sans-serif',
+                    zoom: { enabled: false }
+                },
+                series: [{ name: 'Doanh thu', data: revenue }],
+                colors: ['#6366f1'],
+                stroke: { curve: 'smooth', width: 3 },
+                fill: {
+                    type: 'gradient',
+                    gradient: { shadeIntensity: 1, opacityFrom: 0.35, opacityTo: 0, stops: [0, 90, 100] }
+                },
+                dataLabels: { enabled: false },
+                grid: { borderColor: '#e2e8f0', strokeDashArray: 4, xaxis: { lines: { show: false } } },
+                xaxis: {
+                    categories: labels,
+                    labels: { style: { colors: '#64748b', fontSize: '12px' } },
+                    axisBorder: { show: false },
+                    axisTicks: { show: false }
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: '#64748b', fontSize: '12px' },
+                        formatter: function(v){ return new Intl.NumberFormat('vi-VN').format(v); }
+                    }
+                },
+                legend: { show: false },
+                tooltip: {
+                    theme: 'light',
+                    y: { formatter: function(v){ return new Intl.NumberFormat('vi-VN').format(v) + ' đ'; } }
+                }
+            };
+            new ApexCharts(document.querySelector('#adminRevenueChart'), options).render();
+        })();
+    </script>
+</th:block>
 </body>
 </html>

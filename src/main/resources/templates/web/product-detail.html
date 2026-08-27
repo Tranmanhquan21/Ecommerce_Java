@@ -4,126 +4,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${product.name}">Chi tiết sản phẩm - CNJ70</title>
+    <title th:text="${product.name} + ' - CNJ70 Shop'">Chi tiết sản phẩm - CNJ70</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" th:href="@{/css/product-detail.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Style cho nội dung TinyMCE (description) */
-        .pdp-desc-html {
-            color: #2c3e50;
-            line-height: 1.7;
-            font-size: 15px;
-        }
-        .pdp-desc-html h1, .pdp-desc-html h2, .pdp-desc-html h3 {
-            margin: 18px 0 12px;
-            color: #1a2a3a;
-            font-weight: 700;
-        }
-        .pdp-desc-html h1 { font-size: 22px; }
-        .pdp-desc-html h2 { font-size: 19px; }
-        .pdp-desc-html h3 { font-size: 16px; }
-        .pdp-desc-html p { margin: 10px 0; }
-        .pdp-desc-html ul, .pdp-desc-html ol {
-            margin: 10px 0;
-            padding-left: 28px;
-        }
-        .pdp-desc-html li { margin: 4px 0; }
-        .pdp-desc-html img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin: 12px 0;
-            display: block;
-        }
-        .pdp-desc-html table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 12px 0;
-        }
-        .pdp-desc-html th, .pdp-desc-html td {
-            border: 1px solid var(--border);
-            padding: 8px 12px;
-            text-align: left;
-        }
-        .pdp-desc-html th {
-            background: var(--bg-muted);
-            font-weight: 600;
-        }
-        .pdp-desc-html a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-        .pdp-desc-html a:hover { text-decoration: underline; }
-        .pdp-desc-html blockquote {
-            border-left: 4px solid var(--primary);
-            padding: 8px 16px;
-            margin: 12px 0;
-            background: var(--bg-muted);
-            color: var(--ink-soft);
-        }
-        .pdp-desc-html code {
-            background: var(--bg-muted);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 13px;
-        }
-    </style>
 </head>
-<body>
+<body class="pdp-page">
     <div th:replace="fragments/web-header"></div>
     
-    <main class="main-content">
+    <!-- Sticky header bar with rating/preview/sold info -->
+    <div class="pdp-sticky-header" id="pdp-sticky-header" style="display:none;">
         <div class="container">
-            <div class="product-detail">
-                <div class="product-images">
-                    <img th:src="${product.thumbnailUrl ?: '/images/placeholder.jpg'}" th:alt="${product.name}">
+            <div class="pdp-sticky-inner">
+                <div class="pdp-sticky-img">
+                    <img th:src="${product.thumbnailUrl ?: 'https://placehold.co/60x60/f0f7f6/0fb5b0?text=No+Img'}" th:alt="${product.name}">
                 </div>
-                <div class="product-info">
-                    <h1 th:text="${product.name}">Tên sản phẩm</h1>
-                    <p class="shop-name">
-                        <i class="fas fa-store"></i>
-                        <span th:text="${product.shopName}">Tên shop</span>
-                    </p>
-                    <p class="price" th:text="${@money.format(product.price)}">0đ</p>
-                    <p class="stock">
-                        <i class="fas fa-box"></i>
-                        Còn lại: <span th:text="${product.stock}">0</span> sản phẩm
-                    </p>
-                    <p class="rating">
-                        <i class="fas fa-star"></i>
-                        <span th:text="${product.rating}">0</span>/5 
-                        (<span th:text="${product.reviewCount}">0</span> đánh giá)
-                    </p>
-                    
-                    <div class="product-actions">
-                        <form th:action="@{/cart/add}" method="post" sec:authorize="isAuthenticated()">
-                            <input type="hidden" name="productId" th:value="${product.id}">
-                            <div class="quantity-selector">
-                                <label>Số lượng:</label>
-                                <input type="number" name="quantity" value="1" min="1" max="${product.stock}">
-                            </div>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-cart-plus"></i> Thêm vào giỏ hàng
-                            </button>
-                        </form>
-                        <a sec:authorize="!isAuthenticated()" th:href="@{/auth/login}" class="btn btn-primary">
-                            Đăng nhập để mua hàng
-                        </a>
+                <div class="pdp-sticky-info">
+                    <div class="pdp-sticky-name" th:text="${product.name}">Tên sản phẩm</div>
+                    <div class="pdp-sticky-meta">
+                        <span class="pdp-sticky-rating">
+                            <i class="fas fa-star"></i>
+                            <span th:text="${#numbers.formatDecimal(product.rating, 1, 1)}">0.0</span>
+                        </span>
+                        <span class="pdp-sticky-sold">
+                            Đã bán <strong>1.2k</strong>
+                        </span>
                     </div>
                 </div>
-            </div>
-            
-            <div class="product-description">
-                <h2>Mô tả sản phẩm</h2>
-                <p th:text="${product.description}">Mô tả sản phẩm</p>
+                <div class="pdp-sticky-price" th:text="${@money.format(product.price)}">0đ</div>
             </div>
         </div>
-<<<<<<< HEAD
-    </main>
-    
-    <div th:replace="fragments/web-footer"></div>
-=======
+    </div>
+
+    <main class="main-content">
+        <!-- Breadcrumb -->
+        <div class="pdp-breadcrumb-bar">
+            <div class="container">
+                <nav class="pdp-breadcrumb">
+                    <a th:href="@{/home}">Trang chủ</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <a th:href="@{/products}">Sản phẩm</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <a th:if="${product.categoryName != null}" th:href="@{/products(category=${product.categoryId})}" th:text="${product.categoryName}">Danh mục</a>
+                    <i class="fas fa-chevron-right" th:if="${product.categoryName != null}"></i>
+                    <span th:text="${product.name}">Tên sản phẩm</span>
+                </nav>
+            </div>
+        </div>
 
         <!-- Product Main Section -->
         <section class="pdp-main-section">
@@ -222,49 +153,6 @@
                                 </div>
                             </div>
 
-                            <!-- Variant Picker (danh sách biến thể) -->
-                            <div class="pdp-variant-picker"
-                                 th:if="${product.variants != null and !product.variants.isEmpty()}">
-                                <div class="pdp-variant-picker-title">
-                                    <i class="fas fa-layer-group"></i> Chọn phiên bản:
-                                </div>
-                                <div class="pdp-variant-list" id="variantList">
-                                    <button type="button"
-                                            class="pdp-variant-btn"
-                                            th:each="v, iter : ${product.variants}"
-                                            th:data-name="${v.name}"
-                                            th:data-price="${v.price != null ? v.price : product.price}"
-                                            th:classappend="${iter.index == 0} ? 'active' : ''"
-                                            th:onclick="'selectVariant(this)'">
-                                        <span class="v-name" th:text="${v.name}">Cấu hình</span>
-                                        <span class="v-price" th:text="${v.price != null ? @money.format(v.price) : @money.format(product.price)}">0đ</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Voucher Section (giống Shopee) -->
-                            <div class="pdp-voucher-section" id="pdpVoucherSection">
-                                <label class="pdp-label-s">
-                                    <i class="fas fa-ticket"></i> Voucher khả dụng
-                                </label>
-                                <div class="pdp-voucher-toggle" onclick="toggleVoucherList()">
-                                    <span>Có <strong id="voucherCount">0</strong> voucher</span>
-                                    <i class="fas fa-chevron-down" id="voucherToggleIcon"></i>
-                                </div>
-                                <div class="pdp-voucher-list" id="pdpVoucherList" style="display:none;">
-                                    <div class="pdp-voucher-empty" id="pdpVoucherEmpty">
-                                        Đang tải voucher...
-                                    </div>
-                                </div>
-                                <div class="pdp-voucher-input" sec:authorize="isAuthenticated()">
-                                    <input type="text" id="pdpVoucherCode" placeholder="Hoặc nhập mã voucher...">
-                                    <button type="button" onclick="applyProductVoucher()">
-                                        <i class="fas fa-paper-plane"></i> Áp dụng
-                                    </button>
-                                </div>
-                                <div id="pdpVoucherResult" class="pdp-voucher-result"></div>
-                            </div>
-
                             <!-- Quantity -->
                             <div class="pdp-quantity-section">
                                 <label class="pdp-label-s">Số lượng</label>
@@ -284,7 +172,7 @@
                             <!-- Sticky Action Buttons (always visible at bottom) -->
                             <div class="pdp-sticky-actions">
                                 <div sec:authorize="isAuthenticated()" style="flex:1;">
-                                    <form th:action="@{/cart/add}" method="post" id="add-to-cart-form">
+                                    <form th:action="@{/api/cart/add}" method="post" id="add-to-cart-form">
                                         <input type="hidden" name="productId" th:value="${product.id}">
                                         <input type="hidden" name="quantity" id="hidden-quantity" value="1">
                                         <div class="pdp-btn-row">
@@ -392,9 +280,9 @@
                     <div class="pdp-tabs-content">
                         <!-- Description Tab -->
                         <div class="pdp-tab-panel active" id="tab-description">
-                            <div class="pdp-desc-content pdp-desc-html"
-                                 th:if="${product.description != null and !product.description.isEmpty()}"
-                                 th:utext="${product.description}">Mô tả sản phẩm</div>
+                            <div class="pdp-desc-content" th:if="${product.description != null and !product.description.isEmpty()}">
+                                <p th:text="${product.description}">Mô tả sản phẩm</p>
+                            </div>
                             <div class="pdp-empty-pane" th:if="${product.description == null or product.description.isEmpty()}">
                                 <i class="fas fa-info-circle"></i>
                                 <p>Chưa có mô tả cho sản phẩm này.</p>
@@ -403,39 +291,11 @@
 
                         <!-- Specs Tab -->
                         <div class="pdp-tab-panel" id="tab-specs">
-                            <div class="pdp-specs-table"
-                                 th:if="${(product.commonSpecs != null) or (product.customSpecs != null and !product.customSpecs.isEmpty())}">
-
-                                <!-- Common Specs (luôn có) -->
-                                <th:block th:if="${product.commonSpecs != null}">
-                                    <div class="pdp-spec-row" th:if="${product.commonSpecs.brand != null and product.commonSpecs.brand != ''}">
-                                        <span class="pdp-spec-label">Hãng sản phẩm</span>
-                                        <span class="pdp-spec-value" th:text="${product.commonSpecs.brand}">-</span>
-                                    </div>
-                                    <div class="pdp-spec-row" th:if="${product.commonSpecs.warrantyMonths != null}">
-                                        <span class="pdp-spec-label">Bảo hành</span>
-                                        <span class="pdp-spec-value">
-                                            <span th:text="${product.commonSpecs.warrantyMonths}">0</span> tháng
-                                        </span>
-                                    </div>
-                                    <div class="pdp-spec-row" th:if="${product.commonSpecs.manufacturerName != null and product.commonSpecs.manufacturerName != ''}">
-                                        <span class="pdp-spec-label">Nhà sản xuất</span>
-                                        <span class="pdp-spec-value" th:text="${product.commonSpecs.manufacturerName}">-</span>
-                                    </div>
-                                    <div class="pdp-spec-row" th:if="${product.commonSpecs.manufacturerAddress != null and product.commonSpecs.manufacturerAddress != ''}">
-                                        <span class="pdp-spec-label">Địa chỉ NSX</span>
-                                        <span class="pdp-spec-value" th:text="${product.commonSpecs.manufacturerAddress}">-</span>
-                                    </div>
-                                </th:block>
-
-                                <!-- Custom Specs (vendor tự tạo) -->
-                                <th:block th:if="${product.customSpecs != null and !product.customSpecs.isEmpty()}">
-                                    <div class="pdp-spec-row" th:each="spec : ${product.customSpecs}">
-                                        <span class="pdp-spec-label" th:text="${spec.name}">Tên</span>
-                                        <span class="pdp-spec-value" th:text="${spec.value}">Giá trị</span>
-                                    </div>
-                                </th:block>
-
+                            <div class="pdp-specs-table">
+                                <div class="pdp-spec-row">
+                                    <span class="pdp-spec-label">Tên sản phẩm</span>
+                                    <span class="pdp-spec-value" th:text="${product.name}">-</span>
+                                </div>
                                 <div class="pdp-spec-row">
                                     <span class="pdp-spec-label">Danh mục</span>
                                     <span class="pdp-spec-value" th:text="${product.categoryName != null} ? ${product.categoryName} : '-'">-</span>
@@ -453,14 +313,22 @@
                                     </span>
                                 </div>
                                 <div class="pdp-spec-row">
+                                    <span class="pdp-spec-label">Số lượng tồn</span>
+                                    <span class="pdp-spec-value" th:text="${product.stock} + ' sản phẩm'">0 sản phẩm</span>
+                                </div>
+                                <div class="pdp-spec-row">
+                                    <span class="pdp-spec-label">Đánh giá</span>
+                                    <span class="pdp-spec-value">
+                                        <span class="pdp-spec-pill amber">
+                                            <i class="fas fa-star"></i>
+                                            <span th:text="${#numbers.formatDecimal(product.rating, 1, 1)} + ' / 5'">0.0 / 5</span>
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="pdp-spec-row">
                                     <span class="pdp-spec-label">Mã sản phẩm</span>
                                     <span class="pdp-spec-value" th:text="${product.id}">-</span>
                                 </div>
-                            </div>
-                            <div class="pdp-empty-pane"
-                                 th:if="${product.commonSpecs == null and (product.customSpecs == null or product.customSpecs.isEmpty())}">
-                                <i class="fas fa-info-circle"></i>
-                                <p>Chưa có thông số kỹ thuật cho sản phẩm này.</p>
                             </div>
                         </div>
 
@@ -697,24 +565,44 @@
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
-        // Add to cart
+        // Add to cart - AJAX API
         const cartForm = document.getElementById('add-to-cart-form');
         if (cartForm) {
             cartForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                const submitBtn = cartForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang thêm...';
+                
                 const quantity = document.getElementById('quantity-input').value;
                 document.getElementById('hidden-quantity').value = quantity;
-                const formData = new FormData(this);
-                fetch(this.action, {
+                const formData = new FormData(cartForm);
+                
+                fetch('/api/cart/add', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 })
-                .then(response => {
-                    if (response.ok || response.redirected) {
-                        showToast('Đã thêm vào giỏ hàng!');
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message || 'Đã thêm vào giỏ hàng!');
+                        if (typeof updateCartBadge === 'function' && typeof data.itemCount !== 'undefined') {
+                            updateCartBadge(data.itemCount);
+                        }
+                    } else {
+                        showToast(data.message || 'Có lỗi xảy ra');
                     }
                 })
-                .catch(error => { console.error('Error:', error); });
+                .catch(error => { 
+                    console.error('Error:', error); 
+                    showToast('Có lỗi xảy ra');
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                });
             });
         }
 
@@ -769,283 +657,6 @@
                 if (imageDim) imageDim.style.display = 'none';
             });
         }
-
-        // ===== Variant picker: click variant đổi giá =====
-        function selectVariant(btn) {
-            // Highlight nút được chọn
-            document.querySelectorAll('.pdp-variant-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            // Cập nhật giá trên UI theo variant
-            const priceEl = document.querySelector('.pdp-price');
-            const priceText = btn.querySelector('.v-price')?.textContent;
-            if (priceEl && priceText) {
-                priceEl.textContent = priceText;
-            }
-        }
     </script>
-
-    <script>
-        // ==================== VOUCHER (Shopee-style) ====================
-        const PRODUCT_ID_FOR_VOUCHER = /*[[${product.id}]]*/ null;
-
-        async function loadProductVouchers() {
-            try {
-                const res = await fetch('/api/vouchers/for-product?productId=' + PRODUCT_ID_FOR_VOUCHER);
-                const vouchers = await res.json();
-                const listEl = document.getElementById('pdpVoucherList');
-                const countEl = document.getElementById('voucherCount');
-                if (!listEl) return;
-                countEl.textContent = vouchers.length;
-                if (vouchers.length === 0) {
-                    listEl.innerHTML = '<div class="pdp-voucher-empty">Chưa có voucher nào cho sản phẩm này</div>';
-                    return;
-                }
-                listEl.innerHTML = vouchers.map(v => {
-                    const valueText = v.discountType === 'PERCENT'
-                        ? v.discountValue + '%'
-                        : Number(v.discountValue).toLocaleString('vi-VN') + 'đ';
-                    const isShop = v.type === 'SHOP';
-                    const minOrder = v.minOrderValue ? Number(v.minOrderValue).toLocaleString('vi-VN') + 'đ' : '0đ';
-                    return `
-                        <div class="pdp-voucher-item">
-                            <div class="pdp-voucher-item-left">
-                                <span class="pdp-voucher-tag ${isShop ? 'tag-shop' : 'tag-web'}">${v.type}</span>
-                                <div class="pdp-voucher-item-value">${valueText}</div>
-                            </div>
-                            <div class="pdp-voucher-item-right">
-                                <div class="pdp-voucher-item-name">${v.name}</div>
-                                <div class="pdp-voucher-item-code">
-                                    Mã: <code>${v.code}</code>
-                                    <button onclick="copyCode('${v.code}')"><i class="fas fa-copy"></i></button>
-                                </div>
-                                <div class="pdp-voucher-item-meta">
-                                    Đơn tối thiểu ${minOrder} • Còn ${v.quantity - v.used}/${v.quantity} lượt
-                                </div>
-                            </div>
-                        </div>`;
-                }).join('');
-            } catch (err) {
-                document.getElementById('pdpVoucherList').innerHTML =
-                    '<div class="pdp-voucher-empty">Lỗi tải voucher</div>';
-            }
-        }
-
-        function toggleVoucherList() {
-            const list = document.getElementById('pdpVoucherList');
-            const icon = document.getElementById('voucherToggleIcon');
-            if (list.style.display === 'none') {
-                list.style.display = 'block';
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-up');
-            } else {
-                list.style.display = 'none';
-                icon.classList.add('fa-chevron-down');
-                icon.classList.remove('fa-chevron-up');
-            }
-        }
-
-        function copyCode(code) {
-            navigator.clipboard.writeText(code).then(() => {
-                alert('Đã sao chép mã: ' + code);
-            }).catch(() => {
-                prompt('Sao chép mã này:', code);
-            });
-        }
-
-        async function applyProductVoucher() {
-            const code = document.getElementById('pdpVoucherCode').value.trim();
-            const result = document.getElementById('pdpVoucherResult');
-            if (!code) {
-                result.className = 'pdp-voucher-result error';
-                result.textContent = 'Vui lòng nhập mã voucher';
-                return;
-            }
-            result.className = 'pdp-voucher-result';
-            result.textContent = 'Đang kiểm tra...';
-            try {
-                const url = '/checkout/apply-voucher?code=' + encodeURIComponent(code)
-                    + '&productId=' + encodeURIComponent(PRODUCT_ID_FOR_VOUCHER);
-                const res = await fetch(url, { method: 'POST' });
-                const data = await res.json();
-                if (data.success) {
-                    result.className = 'pdp-voucher-result success';
-                    result.innerHTML = '<i class="fas fa-check-circle"></i> ' + data.message
-                        + ' — Mã đã được lưu, dùng khi thanh toán.';
-                } else {
-                    result.className = 'pdp-voucher-result error';
-                    result.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + data.message;
-                }
-            } catch (err) {
-                result.className = 'pdp-voucher-result error';
-                result.textContent = 'Lỗi kết nối';
-            }
-        }
-
-        // Load voucher khi trang sẵn sàng
-        if (PRODUCT_ID_FOR_VOUCHER) {
-            loadProductVouchers();
-        }
-    </script>
-
-    <style>
-        .pdp-voucher-section {
-            margin: 16px 0;
-            padding: 14px;
-            background: #fff8f0;
-            border: 1px dashed #f5b461;
-            border-radius: 10px;
-        }
-        .pdp-voucher-toggle {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            font-size: 14px;
-            color: #d35400;
-            padding: 4px 0;
-        }
-        .pdp-voucher-toggle strong { color: #e74c3c; }
-        .pdp-voucher-list {
-            margin-top: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 280px;
-            overflow-y: auto;
-        }
-        .pdp-voucher-item {
-            display: flex;
-            background: #fff;
-            border: 1px solid #f0d9b5;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .pdp-voucher-item-left {
-            width: 90px;
-            background: linear-gradient(135deg, #ff8c42, #ff6b35);
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 4px;
-            flex-shrink: 0;
-            position: relative;
-        }
-        .pdp-voucher-item-left::after {
-            content: '';
-            position: absolute;
-            right: -5px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 10px;
-            height: 10px;
-            background: #fff8f0;
-            border-radius: 50%;
-        }
-        .pdp-voucher-tag {
-            position: absolute;
-            top: 4px;
-            left: 4px;
-            padding: 1px 5px;
-            font-size: 9px;
-            border-radius: 3px;
-            font-weight: 600;
-        }
-        .pdp-voucher-tag.tag-shop { background: #f39c12; }
-        .pdp-voucher-tag.tag-web { background: #2980b9; }
-        .pdp-voucher-item-value {
-            font-size: 22px;
-            font-weight: 700;
-        }
-        .pdp-voucher-item-right {
-            flex: 1;
-            padding: 8px 12px;
-            font-size: 13px;
-        }
-        .pdp-voucher-item-name {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 4px;
-        }
-        .pdp-voucher-item-code {
-            color: #555;
-            margin-bottom: 4px;
-        }
-        .pdp-voucher-item-code code {
-            color: #e74c3c;
-            font-weight: 700;
-            font-family: monospace;
-        }
-        .pdp-voucher-item-code button {
-            background: transparent;
-            border: none;
-            color: #3498db;
-            cursor: pointer;
-            padding: 0 4px;
-        }
-        .pdp-voucher-item-meta {
-            font-size: 11px;
-            color: #7f8c8d;
-        }
-        .pdp-voucher-empty {
-            text-align: center;
-            padding: 14px;
-            color: #95a5a6;
-            font-size: 13px;
-        }
-        .pdp-voucher-input {
-            display: flex;
-            gap: 6px;
-            margin-top: 10px;
-        }
-        .pdp-voucher-input input {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid #e1e8ed;
-            border-radius: 6px;
-            font-size: 13px;
-        }
-        .pdp-voucher-input button {
-            padding: 8px 14px;
-            background: #ff6b35;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-        }
-        .pdp-voucher-input button:hover { background: #e55a2b; }
-        .pdp-voucher-result {
-            margin-top: 8px;
-            padding: 0;
-            font-size: 13px;
-        }
-        .pdp-voucher-result.success {
-            padding: 8px 12px;
-            background: #d4edda;
-            color: #155724;
-            border-radius: 6px;
-        }
-        .pdp-voucher-result.error {
-            padding: 8px 12px;
-            background: #f8d7da;
-            color: #721c24;
-            border-radius: 6px;
-        }
-        @media (max-width: 600px) {
-            .pdp-voucher-item { flex-direction: column; }
-            .pdp-voucher-item-left {
-                width: 100%;
-                flex-direction: row;
-                gap: 8px;
-                padding: 8px;
-            }
-            .pdp-voucher-item-left::after { display: none; }
-        }
-    </style>
->>>>>>> dc088f9 (feat: implement voucher module for vendor management)
 </body>
 </html>
